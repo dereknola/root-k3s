@@ -1,0 +1,25 @@
+name: Build
+on:
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - ".drone.yml"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64, arm64, arm, riscv64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Dapper
+        run: |
+          curl -sL https://releases.rancher.com/dapper/latest/dapper-$(uname -s)-$(uname -m) > /usr/local/bin/dapper
+          chmod +x /usr/local/bin/dapper
+
+      - name: Build
+        run: make sub-build-${{ matrix.arch }}
